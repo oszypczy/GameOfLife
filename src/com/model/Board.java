@@ -76,6 +76,11 @@ public class Board extends JPanel {
         this.selectedCoordinates.addAll(nextGeneration);
         repaint();
     }
+
+    public void clearBoard() {
+        this.selectedCoordinates.clear();
+        repaint();
+    }
 }
 
 
