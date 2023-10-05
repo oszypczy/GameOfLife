@@ -3,6 +3,8 @@ package com.model;
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 
 public class Game {
     private final Board board;
@@ -12,16 +14,21 @@ public class Game {
     private final JButton startButton;
     private final JButton resetButton;
 
+    private int boardWidth;
+    private int boardHeight;
+
     public Game(int width, int height) {
+        this.boardWidth = width;
+        this.boardHeight = height;
         JFrame frame = new JFrame("Game of Life");
-        board = new Board(width, height);
+        board = new Board(boardWidth, boardHeight);
 
         startButton = new JButton("Start");
         resetButton = new JButton("Reset");
 
         startButton.addActionListener(e -> {
             if (!simulationStarted) {
-                startGame(width, height);
+                startGame(boardWidth, boardHeight);
             }
         });
 
@@ -39,17 +46,35 @@ public class Game {
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
+
+        frame.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                if (simulationStarted) {
+                    stopGame();
+                    sendMessage("Simulation stopped. User resized the board.");
+                } else {
+                    // Get the new width and height of the board
+                    boardWidth = frame.getWidth();
+                    boardHeight = frame.getHeight();
+
+                    // Update the board with the new dimensions
+                    board.updateBoardSize(boardWidth, boardHeight);
+                }
+            }
+        });
+
         frame.setVisible(true);
     }
 
     private void startGame(int width, int height) {
         grid = new Grid(new int[]{width, height});
         List<List<Integer>> initialAliveCells = board.getSelectedCoordinates();
-        initialAliveCells = checkUserInput(initialAliveCells, width, height);
+        checkUserInput(initialAliveCells, width, height);
         grid.setCellsAlive(initialAliveCells);
         simulationStarted = true;
-        startButton.setEnabled(false); // Disable Start button once simulation is started
-        resetButton.setEnabled(true); // Enable Reset button once simulation is started
+        startButton.setEnabled(false);
+        resetButton.setEnabled(true);
         final int[] generation = {1};
         timer = new Timer(200, e -> {
             List<List<Integer>> nextGeneration = grid.createGeneration();
@@ -58,6 +83,10 @@ public class Game {
             board.setSelectedCoordinates(nextGeneration);
             System.out.println("Generation " + generation[0] + ":");
             System.out.println(nextGeneration);
+            if (nextGeneration.isEmpty()) {
+                stopGame();
+                sendMessage("Simulation stopped. All cells are dead. It took " + generation[0] + " generations.");
+            }
             generation[0]++;
         });
         timer.start();
@@ -71,7 +100,11 @@ public class Game {
         board.clearBoard();
     }
 
-    private List<List<Integer>> checkUserInput(List<List<Integer>> userCells, int maxWidth, int maxHeight) {
+    private void sendMessage(String message) {
+        JOptionPane.showMessageDialog(null, message);
+    }
+
+    private void checkUserInput(List<List<Integer>> userCells, int maxWidth, int maxHeight) {
         for (int index = 0; index < userCells.size(); index++) {
             List<Integer> tempCoordinates = userCells.get(index);
             if (tempCoordinates.get(0) < 0) tempCoordinates.set(0, 0);
@@ -80,6 +113,5 @@ public class Game {
             if (tempCoordinates.get(1) >= maxHeight) tempCoordinates.set(1, maxHeight - 1);
             userCells.set(index, tempCoordinates);
         }
-        return userCells;
     }
 }

@@ -81,6 +81,11 @@ public class Board extends JPanel {
         this.selectedCoordinates.clear();
         repaint();
     }
+
+    public void updateBoardSize(int width, int height) {
+        setPreferredSize(new Dimension(width, height));
+        repaint();
+    }
 }
 
 
