@@ -21,7 +21,7 @@ public class Grid {
         for (List<Integer> aliveCell : aliveCells){
             int i = aliveCell.get(0);
             int j = aliveCell.get(1);
-            cells.get(i).get(j).makeCellAlive(true);
+            cells.get(i).get(j).setCellState(true);
         }
         for (int i = 0; i < dimensions[0]; i++){
             for (int j = 0; j < dimensions[1]; j++){
@@ -31,25 +31,34 @@ public class Grid {
     }
 
     public List<List<Integer>> createGeneration(){
+        List<List<Integer>> cellsToBeChanged = new ArrayList<>();
         List<List<Integer>> aliveCells = new ArrayList<>();
 
         for (int i = 0; i < dimensions[0]; i++){
             for (int j = 0; j < dimensions[1]; j++){
                 Cell cell = cells.get(i).get(j);
                 cell.setAliveNeighbours(getCellAliveNeighbours(i, j));
+                boolean cellState = cell.checkCellState();
+                if (cellState != cell.isAlive()){
+                    List<Integer> cellToBeChanged = new ArrayList<>();
+                    cellToBeChanged.add(i);
+                    cellToBeChanged.add(j);
+                    cellToBeChanged.add(cellState ? 1 : 0);
+                    cellsToBeChanged.add(cellToBeChanged);
+                }
             }
         }
 
-        for (int i = 0; i < dimensions[0]; i++){
-            for (int j = 0; j < dimensions[1]; j++){
-                Cell cell = cells.get(i).get(j);
-                cell.setCellState();
-                if (cell.isAlive()){
-                    List<Integer> aliveCell = new ArrayList<>();
-                    aliveCell.add(i);
-                    aliveCell.add(j);
-                    aliveCells.add(aliveCell);
-                }
+        for (List<Integer> cellInfo : cellsToBeChanged){
+            int i = cellInfo.get(0);
+            int j = cellInfo.get(1);
+            boolean cellState = cellInfo.get(2) == 1;
+            cells.get(i).get(j).setCellState(cellState);
+            if (cellState){
+                List<Integer> aliveCell = new ArrayList<>();
+                aliveCell.add(i);
+                aliveCell.add(j);
+                aliveCells.add(aliveCell);
             }
         }
 

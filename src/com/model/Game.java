@@ -18,6 +18,7 @@ public class Game {
             if (!simulationStarted) {
                 grid = new Grid(new int[]{width, height});
                 List<List<Integer>> initialAliveCells = board.getSelectedCoordinates();
+                initialAliveCells = checkUserInput(initialAliveCells, width, height);
                 grid.setCellsAlive(initialAliveCells);
                 simulationStarted = true;
                 final int[] generation = {1};
@@ -40,5 +41,17 @@ public class Game {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
         frame.setVisible(true);
+    }
+
+    private List<List<Integer>> checkUserInput(List<List<Integer>> userCells, int maxWidth, int maxHeight){
+        for (int index = 0; index < userCells.size(); index++){
+            List<Integer> tempCoordinates = userCells.get(index);
+            if (tempCoordinates.get(0) < 0) tempCoordinates.set(0, 0);
+            if (tempCoordinates.get(0) >= maxWidth) tempCoordinates.set(0, maxWidth - 1);
+            if (tempCoordinates.get(1) < 0) tempCoordinates.set(1, 0);
+            if (tempCoordinates.get(1) >= maxHeight) tempCoordinates.set(1, maxHeight - 1);
+            userCells.set(index, tempCoordinates);
+        }
+        return userCells;
     }
 }

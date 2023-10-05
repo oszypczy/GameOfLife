@@ -13,7 +13,7 @@ public class Cell {
         return isAlive;
     }
 
-    public void makeCellAlive(boolean isAlive){
+    public void setCellState(boolean isAlive){
         this.isAlive = isAlive;
     }
 
@@ -21,12 +21,13 @@ public class Cell {
         this.aliveNeighbours = Math.min(aliveNeighbours, 8);
     }
 
-    public void setCellState(){
+    public boolean checkCellState(){
         if (this.isAlive && (this.aliveNeighbours < 2 || this.aliveNeighbours > 3)){
-            this.isAlive = false;
+            return false;
         } else if (!this.isAlive && this.aliveNeighbours == 3){
-            this.isAlive = true;
+            return true;
         }
+        return this.isAlive;
     }
 
 }
