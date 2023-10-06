@@ -1,3 +1,7 @@
+package org.olisarczi.game;
+
+import lombok.Getter;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -9,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Board extends JPanel {
+    @Getter
     private final List<Point> selectedCoordinates;
     private boolean isMousePressed = false;
     private int prevX, prevY;
@@ -93,9 +98,6 @@ public class Board extends JPanel {
         repaint();
     }
 
-    public List<Point> getSelectedCoordinates() {
-        return selectedCoordinates;
-    }
 }
 
 

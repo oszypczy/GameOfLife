@@ -1,17 +1,13 @@
-package cell;
+package org.olisarczi.game.cell;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class CellContainer {
-    private final int width;
-    private final int height;
 
     private final List<List<Cell>> cells;
 
     public CellContainer(int width, int height){
-        this.width = width;
-        this.height = height;
         this.cells = new ArrayList<>();
         for (int x = 0; x < width; x++) {
             List<Cell> row = new ArrayList<>();
