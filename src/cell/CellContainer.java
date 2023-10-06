@@ -1,4 +1,4 @@
-package com.model;
+package cell;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,7 +7,7 @@ public class CellContainer {
     private final int width;
     private final int height;
 
-    private List<List<Cell>> cells;
+    private final List<List<Cell>> cells;
 
     public CellContainer(int width, int height){
         this.width = width;
@@ -25,4 +25,5 @@ public class CellContainer {
     public Cell getCell(int x, int y){
         return cells.get(x).get(y);
     }
+
 }
