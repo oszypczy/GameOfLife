@@ -50,17 +50,12 @@ public class Game {
         frame.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
-                if (simulationStarted) {
-                    stopGame();
-                    sendMessage("Simulation stopped. User resized the board.");
-                } else {
-                    // Get the new width and height of the board
-                    boardWidth = frame.getWidth();
-                    boardHeight = frame.getHeight();
+                // Get the new width and height of the board
+                boardWidth = frame.getWidth();
+                boardHeight = frame.getHeight();
 
-                    // Update the board with the new dimensions
-                    board.updateBoardSize(boardWidth, boardHeight);
-                }
+                // Update the board with the new dimensions
+                board.updateBoardSize(boardWidth, boardHeight);
             }
         });
 
