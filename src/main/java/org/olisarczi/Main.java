@@ -8,6 +8,6 @@ public class Main {
         int width = Integer.parseInt(args[0]);
         int height = Integer.parseInt(args[1]);
         System.out.println("Width: " + width + ", Height: " + height);
-        SwingUtilities.invokeLater(() -> new Game(width, height));
+        SwingUtilities.invokeLater(() -> new Game(700, 700, 8));
     }
 }

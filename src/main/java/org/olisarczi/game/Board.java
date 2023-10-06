@@ -40,8 +40,8 @@ public class Board extends JPanel {
             @Override
             public void mousePressed(MouseEvent e) {
                 isMousePressed = true;
-                prevTileX = e.getX() / tileSize; // Convert pixel coordinates to tile coordinates
-                prevTileY = e.getY() / tileSize; // Convert pixel coordinates to tile coordinates
+                prevTileX = (int) ((e.getX() / tileSize) / zoomFactor);
+                prevTileY = (int) ((e.getY() / tileSize) / zoomFactor);
                 addCoordinate(prevTileX, prevTileY);
             }
 
@@ -55,8 +55,8 @@ public class Board extends JPanel {
             @Override
             public void mouseDragged(MouseEvent e) {
                 if (isMousePressed) {
-                    int tileX = e.getX() / tileSize; // Convert pixel coordinates to tile coordinates
-                    int tileY = e.getY() / tileSize; // Convert pixel coordinates to tile coordinates
+                    int tileX = (int) ((e.getX() / tileSize) / zoomFactor);
+                    int tileY = (int) ((e.getY() / tileSize) / zoomFactor);
                     if (tileX != prevTileX || tileY != prevTileY) {
                         addCoordinate(tileX, tileY);
                         prevTileX = tileX;
