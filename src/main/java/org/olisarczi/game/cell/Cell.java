@@ -1,7 +1,10 @@
-package cell;
+package org.olisarczi.game.cell;
+
+import lombok.Getter;
 
 public class Cell {
 
+    @Getter
     private CellState state;
     private int aliveNeighboursCount;
 
@@ -21,10 +24,6 @@ public class Cell {
         } else if (!isAlive && this.aliveNeighboursCount == 3){
             return CellState.ALIVE;
         }
-        return state;
-    }
-
-    public CellState getState() {
         return state;
     }
 
