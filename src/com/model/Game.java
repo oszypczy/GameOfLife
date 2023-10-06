@@ -63,8 +63,8 @@ public class Game {
     }
 
     private void startGame(int width, int height) {
-        grid = new Grid(new int[]{width, height});
-        List<List<Integer>> initialAliveCells = board.getSelectedCoordinates();
+        grid = new Grid(width, height);
+        List<Point> initialAliveCells = board.getSelectedCoordinates();
         checkUserInput(initialAliveCells, width, height);
         grid.setCellsAlive(initialAliveCells);
         simulationStarted = true;
@@ -72,13 +72,14 @@ public class Game {
         resetButton.setEnabled(true);
         final int[] generation = {1};
         timer = new Timer(200, e -> {
-            List<List<Integer>> nextGeneration = grid.createGeneration();
+            grid = grid.getNextGeneration();
+            List<Point> nextAliveCellsCords = grid.getAliveCellsCords();
+
             System.out.println("Alive cells in generation " + generation[0] + ":");
-            System.out.println(nextGeneration);
-            board.setSelectedCoordinates(nextGeneration);
+            board.setSelectedCoordinates(nextAliveCellsCords);
             System.out.println("Generation " + generation[0] + ":");
-            System.out.println(nextGeneration);
-            if (nextGeneration.isEmpty()) {
+            System.out.println(nextAliveCellsCords);
+            if (nextAliveCellsCords.isEmpty()) {
                 stopGame();
                 sendMessage("Simulation stopped. All cells are dead. It took " + generation[0] + " generations.");
             }
@@ -99,14 +100,15 @@ public class Game {
         JOptionPane.showMessageDialog(null, message);
     }
 
-    private void checkUserInput(List<List<Integer>> userCells, int maxWidth, int maxHeight) {
+    private void checkUserInput(List<Point> userCells, int maxWidth, int maxHeight) {
         for (int index = 0; index < userCells.size(); index++) {
-            List<Integer> tempCoordinates = userCells.get(index);
-            if (tempCoordinates.get(0) < 0) tempCoordinates.set(0, 0);
-            if (tempCoordinates.get(0) >= maxWidth) tempCoordinates.set(0, maxWidth - 1);
-            if (tempCoordinates.get(1) < 0) tempCoordinates.set(1, 0);
-            if (tempCoordinates.get(1) >= maxHeight) tempCoordinates.set(1, maxHeight - 1);
+            Point tempCoordinates = userCells.get(index);
+            if (tempCoordinates.x < 0) tempCoordinates.x = 0;
+            if (tempCoordinates.x >= maxWidth) tempCoordinates.x = maxWidth - 1;
+            if (tempCoordinates.y < 0) tempCoordinates.y = 0;
+            if (tempCoordinates.y >= maxHeight) tempCoordinates.y = maxHeight - 1;
             userCells.set(index, tempCoordinates);
         }
     }
+
 }

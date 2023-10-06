@@ -3,13 +3,13 @@ package com.model;
 public class Cell {
     public Cell(){
         this.isAlive = false;
-        this.aliveNeighbours = 0;
+        this.aliveNeighboursCount = 0;
     }
 
     private boolean isAlive;
-    private int aliveNeighbours;
+    private int aliveNeighboursCount;
 
-    public boolean isAlive() {
+    public boolean getCellState() {
         return isAlive;
     }
 
@@ -17,14 +17,14 @@ public class Cell {
         this.isAlive = isAlive;
     }
 
-    public void setAliveNeighbours(int aliveNeighbours) {
-        this.aliveNeighbours = Math.min(aliveNeighbours, 8);
+    public void setAliveNeighboursCount(int aliveNeighboursCount) {
+        this.aliveNeighboursCount = Math.min(aliveNeighboursCount, 8);
     }
 
-    public boolean checkCellState(){
-        if (this.isAlive && (this.aliveNeighbours < 2 || this.aliveNeighbours > 3)){
+    public boolean getNextState(){
+        if (this.isAlive && (this.aliveNeighboursCount < 2 || this.aliveNeighboursCount > 3)){
             return false;
-        } else if (!this.isAlive && this.aliveNeighbours == 3){
+        } else if (!this.isAlive && this.aliveNeighboursCount == 3){
             return true;
         }
         return this.isAlive;

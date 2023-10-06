@@ -1,5 +1,6 @@
 package com.model;
 
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -11,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Board extends JPanel {
-    private final List<List<Integer>> selectedCoordinates;
+    private final List<Point> selectedCoordinates;
     private boolean isMousePressed = false;
     private int prevX, prevY;
 
@@ -62,10 +63,7 @@ public class Board extends JPanel {
     }
 
     private void addCoordinate(int x, int y) {
-        List<Integer> coordinates = new ArrayList<>();
-        coordinates.add(x);
-        coordinates.add(y);
-        selectedCoordinates.add(coordinates);
+        selectedCoordinates.add(new Point(x, y));
         repaint();
     }
 
@@ -77,22 +75,18 @@ public class Board extends JPanel {
         AffineTransform at = new AffineTransform();
         at.scale(zoomFactor, zoomFactor);
         g2.transform(at);
-        for (List<Integer> coordinates : selectedCoordinates) {
-            int x = coordinates.get(0);
-            int y = coordinates.get(1);
-            int scaledX = (int) (x / zoomFactor);
-            int scaledY = (int) (y / zoomFactor);
-            g.fillRect(scaledX, scaledY, 1, 1);
+        for (Point point : selectedCoordinates) {
+            g.fillRect(point.x, point.y, 1, 1);
         }
     }
 
-    public List<List<Integer>> getSelectedCoordinates() {
+    public List<Point> getSelectedCoordinates() {
         return selectedCoordinates;
     }
 
-    public void setSelectedCoordinates(List<List<Integer>> nextGeneration) {
+    public void setSelectedCoordinates(List<Point> aliveCellsCords) {
         this.selectedCoordinates.clear();
-        this.selectedCoordinates.addAll(nextGeneration);
+        this.selectedCoordinates.addAll(aliveCellsCords);
         repaint();
     }
 
