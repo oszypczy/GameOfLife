@@ -1,6 +1,7 @@
 package org.olisarczi.game;
 
 import lombok.Getter;
+import lombok.Setter;
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,12 +17,22 @@ public class Board extends JPanel {
     @Getter
     private final List<Point> selectedCoordinates;
     private boolean isMousePressed = false;
-    private int prevX, prevY;
+    private int prevTileX, prevTileY;
 
     private double zoomFactor = 1;
 
-    public Board(int width, int height) {
-        setPreferredSize(new Dimension(width, height));
+    @Setter
+    private int boardWidthInTiles;
+    @Setter
+    private int boardHeightInTiles;
+
+    private final int tileSize;
+
+    public Board(int widthInTiles, int heightInTiles, int tileSize) {
+        this.boardWidthInTiles = widthInTiles;
+        this.boardHeightInTiles = heightInTiles;
+        this.tileSize = tileSize;
+        setPreferredSize(new Dimension(widthInTiles * tileSize, heightInTiles * tileSize));
         setBackground(Color.GRAY);
         selectedCoordinates = new ArrayList<>();
 
@@ -29,9 +40,9 @@ public class Board extends JPanel {
             @Override
             public void mousePressed(MouseEvent e) {
                 isMousePressed = true;
-                prevX = e.getX();
-                prevY = e.getY();
-                addCoordinate(prevX, prevY);
+                prevTileX = (int) ((e.getX() / tileSize) / zoomFactor);
+                prevTileY = (int) ((e.getY() / tileSize) / zoomFactor);
+                addCoordinate(prevTileX, prevTileY);
             }
 
             @Override
@@ -44,11 +55,13 @@ public class Board extends JPanel {
             @Override
             public void mouseDragged(MouseEvent e) {
                 if (isMousePressed) {
-                    int x = e.getX();
-                    int y = e.getY();
-                    addCoordinate(x, y);
-                    prevX = x;
-                    prevY = y;
+                    int tileX = (int) ((e.getX() / tileSize) / zoomFactor);
+                    int tileY = (int) ((e.getY() / tileSize) / zoomFactor);
+                    if (tileX != prevTileX || tileY != prevTileY) {
+                        addCoordinate(tileX, tileY);
+                        prevTileX = tileX;
+                        prevTileY = tileY;
+                    }
                 }
             }
         });
@@ -58,27 +71,37 @@ public class Board extends JPanel {
             public void mouseWheelMoved(MouseWheelEvent e) {
                 int rotation = e.getWheelRotation();
                 double scaleFactor = Math.pow(1.1, -rotation);
-                zoomFactor *= scaleFactor;
+                double newZoomFactor = zoomFactor * scaleFactor;
+                zoomFactor = Math.max(newZoomFactor, 1);
                 repaint();
             }
         });
     }
 
-    private void addCoordinate(int x, int y) {
-        selectedCoordinates.add(new Point(x, y));
+    private void addCoordinate(int tileX, int tileY) {
+        selectedCoordinates.add(new Point(tileX, tileY));
         repaint();
     }
 
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        g.setColor(Color.WHITE);
+        g.setColor(Color.BLACK);
         Graphics2D g2 = (Graphics2D) g;
         AffineTransform at = new AffineTransform();
         at.scale(zoomFactor, zoomFactor);
         g2.transform(at);
+
+        // Draw grid lines
+        for (int x = 0; x < boardWidthInTiles; x++) {
+            for (int y = 0; y < boardHeightInTiles; y++) {
+                g.drawRect(x * tileSize, y * tileSize, tileSize, tileSize);
+            }
+        }
+
+        g.setColor(Color.WHITE);
         for (Point point : selectedCoordinates) {
-            g.fillRect(point.x, point.y, 1, 1);
+            g.fillRect(point.x * tileSize, point.y * tileSize, tileSize, tileSize);
         }
     }
 
@@ -93,9 +116,8 @@ public class Board extends JPanel {
         repaint();
     }
 
-    public void updateBoardSize(int width, int height) {
-        setPreferredSize(new Dimension(width, height));
-        repaint();
+    public void updateBoardSize() {
+        setPreferredSize(new Dimension(boardWidthInTiles, boardHeightInTiles));
     }
 
 }
