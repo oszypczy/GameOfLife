@@ -71,7 +71,8 @@ public class Board extends JPanel {
             public void mouseWheelMoved(MouseWheelEvent e) {
                 int rotation = e.getWheelRotation();
                 double scaleFactor = Math.pow(1.1, -rotation);
-                zoomFactor *= scaleFactor;
+                double newZoomFactor = zoomFactor * scaleFactor;
+                zoomFactor = Math.max(newZoomFactor, 1);
                 repaint();
             }
         });
