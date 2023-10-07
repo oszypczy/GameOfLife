@@ -26,6 +26,11 @@ public class Board extends JPanel {
     @Setter
     private int boardHeightInTiles;
 
+    @Setter
+    private Color aliveCellColor = Color.WHITE;
+    @Setter
+    private Color gridColor = Color.BLACK;
+
     private final int tileSize;
 
     public Board(int widthInTiles, int heightInTiles, int tileSize) {
@@ -85,22 +90,22 @@ public class Board extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        g.setColor(Color.BLACK);
         Graphics2D g2 = (Graphics2D) g;
         AffineTransform at = new AffineTransform();
         at.scale(zoomFactor, zoomFactor);
         g2.transform(at);
 
+        g.setColor(aliveCellColor);
+        for (Point point : selectedCoordinates) {
+            g.fillRect(point.x * tileSize, point.y * tileSize, tileSize, tileSize);
+        }
+
+        g.setColor(gridColor);
         // Draw grid lines
         for (int x = 0; x < boardWidthInTiles; x++) {
             for (int y = 0; y < boardHeightInTiles; y++) {
                 g.drawRect(x * tileSize, y * tileSize, tileSize, tileSize);
             }
-        }
-
-        g.setColor(Color.WHITE);
-        for (Point point : selectedCoordinates) {
-            g.fillRect(point.x * tileSize, point.y * tileSize, tileSize, tileSize);
         }
     }
 

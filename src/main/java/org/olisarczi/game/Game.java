@@ -7,6 +7,7 @@ import java.awt.*;
 import java.util.List;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.util.Objects;
 
 public class Game {
     private final Board board;
@@ -27,6 +28,8 @@ public class Game {
     private final JLabel generationLabel;
     private final JLabel delayLabel;
 
+    private Color currentThemeGridColor = Color.BLACK;
+
     public Game(int pixelsWidth, int pixelsHeight, int tileSize) {
         this.boardWidthInTiles = pixelsWidth / tileSize;
         this.boardHeightInTiles = pixelsHeight / tileSize;
@@ -40,6 +43,62 @@ public class Game {
         delayLabel = new JLabel("Delay (ms): " + timerDelay);
         JButton increaseDelayButton = new JButton("+");
         JButton decreaseDelayButton = new JButton("-");
+        JToggleButton toggleButton = new JToggleButton("Grid ON");
+        JLabel themeLabel = new JLabel("Theme: ");
+        String[] options = {"Vanilla", "Fire", "Blueprint"};
+        JComboBox<String> comboBox = new JComboBox<>(options);
+
+        toggleButton.addActionListener(e -> {
+            if (toggleButton.isSelected()) {
+                toggleButton.setText("Grid OFF");
+                board.setGridColor(board.getBackground());
+                board.repaint();
+            } else {
+                toggleButton.setText("Grid ON");
+                board.setGridColor(currentThemeGridColor);
+                board.repaint();
+            }
+        });
+
+        comboBox.addActionListener(e -> {
+            String selectedOption = (String) comboBox.getSelectedItem();
+            switch (Objects.requireNonNull(selectedOption)) {
+                case "Vanilla" -> {
+                    board.setBackground(Color.GRAY);
+                    board.setAliveCellColor(Color.WHITE);
+                    if (toggleButton.isSelected()) {
+                        board.setGridColor(Color.GRAY);
+                    } else {
+                        board.setGridColor(Color.BLACK);
+                    }
+                    currentThemeGridColor = Color.BLACK;
+                    board.repaint();
+                }
+                case "Fire" -> {
+                    board.setBackground(Color.BLACK);
+                    board.setAliveCellColor(Color.ORANGE);
+                    if (toggleButton.isSelected()) {
+                        board.setGridColor(Color.BLACK);
+                    } else {
+                        board.setGridColor(Color.GRAY);
+                    }
+                    currentThemeGridColor = Color.GRAY;
+                    board.repaint();
+                }
+                case "Blueprint" -> {
+                    Color darkBlue = new Color(0, 32, 128);
+                    board.setBackground(darkBlue);
+                    board.setAliveCellColor(Color.YELLOW);
+                    if (toggleButton.isSelected()) {
+                        board.setGridColor(darkBlue);
+                    } else {
+                        board.setGridColor(Color.DARK_GRAY);
+                    }
+                    currentThemeGridColor = Color.DARK_GRAY;
+                    board.repaint();
+                }
+            }
+        });
 
         startButton.addActionListener(e -> {
             if (gameState == GameState.STOPPED) {
@@ -94,6 +153,11 @@ public class Game {
         buttonPanel.add(increaseDelayButton);
         buttonPanel.add(decreaseDelayButton);
         frame.add(buttonPanel, BorderLayout.SOUTH);
+        JPanel upperPanel = new JPanel();
+        upperPanel.add(themeLabel);
+        upperPanel.add(comboBox);
+        upperPanel.add(toggleButton);
+        frame.add(upperPanel, BorderLayout.NORTH);
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
