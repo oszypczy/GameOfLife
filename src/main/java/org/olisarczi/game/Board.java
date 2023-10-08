@@ -28,6 +28,8 @@ public class Board extends JPanel {
     private Color aliveCellColor = Color.WHITE;
     @Setter
     private Color gridColor = Color.BLACK;
+    @Setter
+    private GameState gameState = GameState.STOPPED;
     private final int tileSize;
     private Point zoomCenter = new Point(0, 0);
     private final Point lastTouchedTile = new Point(-1, -1);
@@ -46,17 +48,19 @@ public class Board extends JPanel {
         addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                Point translatedPoint = translateMouseCoordinates(e.getPoint());
-                prevTileX = translatedPoint.x;
-                prevTileY = translatedPoint.y;
-                lastTouchedTile.setLocation(prevTileX, prevTileY);
+                if (gameState != GameState.RUNNING){
+                    Point translatedPoint = translateMouseCoordinates(e.getPoint());
+                    prevTileX = translatedPoint.x;
+                    prevTileY = translatedPoint.y;
+                    lastTouchedTile.setLocation(prevTileX, prevTileY);
 
-                if (e.getButton() == MouseEvent.BUTTON1) {
-                    isLeftClicked = true;
-                    addCoordinates(prevTileX, prevTileY);
-                } else if (e.getButton() == MouseEvent.BUTTON3) {
-                    isRightClicked = true;
-                    removeCoordinates(prevTileX, prevTileY);
+                    if (e.getButton() == MouseEvent.BUTTON1) {
+                        isLeftClicked = true;
+                        addCoordinates(prevTileX, prevTileY);
+                    } else if (e.getButton() == MouseEvent.BUTTON3) {
+                        isRightClicked = true;
+                        removeCoordinates(prevTileX, prevTileY);
+                    }
                 }
             }
             @Override

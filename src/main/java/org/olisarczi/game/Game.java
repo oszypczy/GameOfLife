@@ -114,7 +114,6 @@ public class Game {
             if (gameState == GameState.STOPPED) {
                 startGame();
             } else if (gameState == GameState.PAUSED) {
-                gameState = GameState.RUNNING;
                 startButton.setEnabled(false);
                 stopButton.setEnabled(true);
                 resumeGame();
@@ -123,7 +122,6 @@ public class Game {
 
         stopButton.addActionListener(e -> {
             if (gameState == GameState.RUNNING) {
-                gameState = GameState.PAUSED;
                 startButton.setEnabled(true);
                 stopButton.setEnabled(false);
                 pauseGame();
@@ -135,6 +133,7 @@ public class Game {
                 stopGame();
             } else {
                 gameState = GameState.STOPPED;
+                board.setGameState(gameState);
                 board.clearBoard();
             }
         });
@@ -180,6 +179,7 @@ public class Game {
             setUserAliveCells();
         }
         gameState = GameState.RUNNING;
+        board.setGameState(gameState);
         startButton.setEnabled(false);
         stopButton.setEnabled(true);
         final int[] generation = {1};
@@ -206,17 +206,20 @@ public class Game {
 
     private void pauseGame() {
         gameState = GameState.PAUSED;
+        board.setGameState(gameState);
         timer.stop();
     }
 
     private void resumeGame() {
         gameState = GameState.RUNNING;
+        board.setGameState(gameState);
         setUserAliveCells();
         timer.start();
     }
 
     private void stopGame() {
         gameState = GameState.STOPPED;
+        board.setGameState(gameState);
         timer.stop();
         startButton.setEnabled(true);
         stopButton.setEnabled(false);
