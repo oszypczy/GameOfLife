@@ -8,42 +8,77 @@ import java.util.List;
 import java.util.Objects;
 
 public class Game {
-    private final Board board;
+    private Board board;
     private Grid grid;
+    private JFrame frame;
     private GameState gameState = GameState.STOPPED;
     private Timer timer;
-    private final JButton startButton;
-    private final JButton stopButton;
-
+    private JButton startButton;
+    private JButton stopButton;
+    private JButton resetButton;
+    private JButton increaseDelayButton;
+    private JButton decreaseDelayButton;
+    private JToggleButton toggleButton;
     private int boardWidthInTiles;
     private int boardHeightInTiles;
-
     private int timerDelay = 200;
-
-    private final JLabel generationLabel;
-    private final JLabel delayLabel;
-
+    private JLabel generationLabel;
+    private JLabel delayLabel;
+    private JComboBox<String> comboBox;
     private final Theme theme = new Theme();
 
     public Game(int pixelsWidth, int pixelsHeight, int tileSize) {
         this.boardWidthInTiles = pixelsWidth / tileSize;
         this.boardHeightInTiles = pixelsHeight / tileSize;
-        this.generationLabel = new JLabel("Generation: 0");
-        JFrame frame = new JFrame("Game of Life");
+        initializeGUI(tileSize);
+        listenToEvent(tileSize);
+    }
+
+    private void initializeGUI(int tileSize) {
+        // create frame and pixel board
+        frame = new JFrame("Game of Life");
         board = new Board(boardWidthInTiles, boardHeightInTiles, tileSize);
 
+        // create buttons
         startButton = new JButton("Start");
         stopButton = new JButton("Stop");
-        JButton resetButton = new JButton("Reset");
-        delayLabel = new JLabel("Delay (ms): " + timerDelay);
-        JButton increaseDelayButton = new JButton("+");
-        JButton decreaseDelayButton = new JButton("-");
-        JToggleButton toggleButton = new JToggleButton("Grid ON");
+        resetButton = new JButton("Reset");
+        increaseDelayButton = new JButton("+");
+        decreaseDelayButton = new JButton("-");
+        toggleButton = new JToggleButton("Grid ON");
         toggleButton.setSelected(true);
-        JLabel themeLabel = new JLabel("Theme: ");
-        String[] options = {"Vanilla", "Fire", "Blueprint"};
-        JComboBox<String> comboBox = new JComboBox<>(options);
 
+        // create labels
+        generationLabel = new JLabel("Generation: 0");
+        delayLabel = new JLabel("Delay (ms): " + timerDelay);
+        JLabel themeLabel = new JLabel("Theme: ");
+
+        // create dropdown list
+        String[] options = {"Vanilla", "Fire", "Blueprint"};
+        comboBox = new JComboBox<>(options);
+
+        // add components to frame
+        frame.add(board, BorderLayout.CENTER);
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(generationLabel);
+        buttonPanel.add(startButton);
+        buttonPanel.add(stopButton);
+        buttonPanel.add(resetButton);
+        buttonPanel.add(delayLabel);
+        buttonPanel.add(increaseDelayButton);
+        buttonPanel.add(decreaseDelayButton);
+        frame.add(buttonPanel, BorderLayout.SOUTH);
+        JPanel upperPanel = new JPanel();
+        upperPanel.add(themeLabel);
+        upperPanel.add(comboBox);
+        upperPanel.add(toggleButton);
+        frame.add(upperPanel, BorderLayout.NORTH);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.pack();
+        frame.setVisible(true);
+    }
+
+    private void listenToEvent(int tileSize){
         toggleButton.addActionListener(e -> {
             if (toggleButton.isSelected()) {
                 toggleButton.setText("Grid ON");
@@ -117,26 +152,6 @@ public class Game {
                 timer.setDelay(timerDelay);
             }
         });
-
-        frame.add(board, BorderLayout.CENTER);
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.add(generationLabel);
-        buttonPanel.add(startButton);
-        buttonPanel.add(stopButton);
-        buttonPanel.add(resetButton);
-        buttonPanel.add(delayLabel);
-        buttonPanel.add(increaseDelayButton);
-        buttonPanel.add(decreaseDelayButton);
-        frame.add(buttonPanel, BorderLayout.SOUTH);
-        JPanel upperPanel = new JPanel();
-        upperPanel.add(themeLabel);
-        upperPanel.add(comboBox);
-        upperPanel.add(toggleButton);
-        frame.add(upperPanel, BorderLayout.NORTH);
-
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.pack();
-
         frame.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
@@ -155,8 +170,6 @@ public class Game {
                 setUserAliveCells();
             }
         });
-
-        frame.setVisible(true);
     }
 
     private void startGame() {
@@ -211,7 +224,7 @@ public class Game {
     }
 
     private void sendMessage(String message) {
-        JOptionPane.showMessageDialog(null, message);
+        JOptionPane.showMessageDialog(frame, message);
     }
 
     private void setUserAliveCells() {
