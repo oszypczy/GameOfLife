@@ -3,6 +3,7 @@ package org.olisarczi.game;
 import org.olisarczi.game.cell.CellContainer;
 import org.olisarczi.game.cell.CellState;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 

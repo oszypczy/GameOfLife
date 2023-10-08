@@ -42,8 +42,9 @@ public class Board extends JPanel {
             @Override
             public void mousePressed(MouseEvent e) {
                 isMousePressed = true;
-                prevTileX = (int) ((e.getX() / tileSize) / zoomFactor);
-                prevTileY = (int) ((e.getY() / tileSize) / zoomFactor);
+                Point translatedPoint = translateMouseCoordinates(e.getPoint());
+                prevTileX = translatedPoint.x;
+                prevTileY = translatedPoint.y;
                 addCoordinate(prevTileX, prevTileY);
             }
 
@@ -57,15 +58,12 @@ public class Board extends JPanel {
             @Override
             public void mouseDragged(MouseEvent e) {
                 if (isMousePressed) {
-                    int tileX = (int) ((e.getX() / tileSize) / zoomFactor);
-                    int tileY = (int) ((e.getY() / tileSize) / zoomFactor);
-                    if (tileX != prevTileX || tileY != prevTileY) {
-                        addCoordinate(tileX, tileY);
-                        prevTileX = tileX;
-                        prevTileY = tileY;
+                    Point translatedPoint = translateMouseCoordinates(e.getPoint());
+                    prevTileX = translatedPoint.x;
+                    prevTileY = translatedPoint.y;
+                    addCoordinate(prevTileX, prevTileY);
                     }
                 }
-            }
         });
 
         addMouseWheelListener(new MouseAdapter() {
@@ -79,6 +77,25 @@ public class Board extends JPanel {
                 repaint();
             }
         });
+    }
+
+    private Point translateMouseCoordinates(Point coordinates) {
+        int mouseX = coordinates.x;
+        int mouseY = coordinates.y;
+
+        int dx = mouseX - zoomCenter.x;
+        int dy = mouseY - zoomCenter.y;
+
+        int zoomedX = (int) (dx / zoomFactor);
+        int zoomedY = (int) (dy / zoomFactor);
+
+        int scaledX = zoomCenter.x + zoomedX;
+        int scaledY = zoomCenter.y + zoomedY;
+
+        int tileX = scaledX / tileSize;
+        int tileY = scaledY / tileSize;
+
+        return new Point(tileX, tileY);
     }
 
     private void addCoordinate(int tileX, int tileY) {
