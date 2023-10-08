@@ -28,6 +28,8 @@ public class Board extends JPanel {
 
     private final int tileSize;
 
+    private java.awt.Point zoomCenter = new java.awt.Point(0, 0);
+
     public Board(int widthInTiles, int heightInTiles, int tileSize) {
         this.boardWidthInTiles = widthInTiles;
         this.boardHeightInTiles = heightInTiles;
@@ -71,6 +73,7 @@ public class Board extends JPanel {
             public void mouseWheelMoved(MouseWheelEvent e) {
                 int rotation = e.getWheelRotation();
                 double scaleFactor = Math.pow(1.1, -rotation);
+                zoomCenter = e.getPoint(); // Store the cursor position
                 double newZoomFactor = zoomFactor * scaleFactor;
                 zoomFactor = Math.max(newZoomFactor, 1);
                 repaint();
@@ -88,8 +91,12 @@ public class Board extends JPanel {
         super.paintComponent(g);
         g.setColor(Color.BLACK);
         Graphics2D g2 = (Graphics2D) g;
+
+        // Calculate the transformation matrix
         AffineTransform at = new AffineTransform();
-        at.scale(zoomFactor, zoomFactor);
+        at.translate(zoomCenter.x, zoomCenter.y); // Translate to the cursor position
+        at.scale(zoomFactor, zoomFactor); // Apply scaling
+        at.translate(-zoomCenter.x, -zoomCenter.y); // Translate back to the original position
         g2.transform(at);
 
         // Draw grid lines
@@ -119,7 +126,4 @@ public class Board extends JPanel {
     public void updateBoardSize() {
         setPreferredSize(new Dimension(boardWidthInTiles, boardHeightInTiles));
     }
-
 }
-
-
