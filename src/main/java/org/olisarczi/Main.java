@@ -12,5 +12,5 @@ public class Main {
 // to do:
 // - add tests
 // - right click to kill cell
-// - fix zooming
 // - add patterns
+// - better logging

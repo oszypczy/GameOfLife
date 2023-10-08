@@ -1,12 +1,10 @@
 package org.olisarczi.game;
 
-import lombok.Getter;
-
 import javax.swing.*;
 import java.awt.*;
-import java.util.List;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.util.List;
 import java.util.Objects;
 
 public class Game {
@@ -20,15 +18,12 @@ public class Game {
     private int boardWidthInTiles;
     private int boardHeightInTiles;
 
-    @Getter
-    private GameState state;
-
     private int timerDelay = 200;
 
     private final JLabel generationLabel;
     private final JLabel delayLabel;
 
-    private Color currentThemeGridColor = Color.BLACK;
+    private final Theme theme = new Theme();
 
     public Game(int pixelsWidth, int pixelsHeight, int tileSize) {
         this.boardWidthInTiles = pixelsWidth / tileSize;
@@ -44,18 +39,20 @@ public class Game {
         JButton increaseDelayButton = new JButton("+");
         JButton decreaseDelayButton = new JButton("-");
         JToggleButton toggleButton = new JToggleButton("Grid ON");
+        toggleButton.setSelected(true);
         JLabel themeLabel = new JLabel("Theme: ");
         String[] options = {"Vanilla", "Fire", "Blueprint"};
         JComboBox<String> comboBox = new JComboBox<>(options);
 
         toggleButton.addActionListener(e -> {
             if (toggleButton.isSelected()) {
-                toggleButton.setText("Grid OFF");
-                board.setGridColor(board.getBackground());
+                toggleButton.setText("Grid ON");
+                board.setGridColor(theme.getThemeGridColor());
                 board.repaint();
             } else {
-                toggleButton.setText("Grid ON");
-                board.setGridColor(currentThemeGridColor);
+                toggleButton.setText("Grid OFF");
+                toggleButton.setBackground(Color.RED);
+                board.setGridColor(null);
                 board.repaint();
             }
         });
@@ -64,38 +61,16 @@ public class Game {
             String selectedOption = (String) comboBox.getSelectedItem();
             switch (Objects.requireNonNull(selectedOption)) {
                 case "Vanilla" -> {
-                    board.setBackground(Color.GRAY);
-                    board.setAliveCellColor(Color.WHITE);
-                    if (toggleButton.isSelected()) {
-                        board.setGridColor(Color.GRAY);
-                    } else {
-                        board.setGridColor(Color.BLACK);
-                    }
-                    currentThemeGridColor = Color.BLACK;
-                    board.repaint();
+                    theme.setTheme(ThemeName.VANILLA, toggleButton.isSelected());
+                    board.setTheme(theme);
                 }
                 case "Fire" -> {
-                    board.setBackground(Color.BLACK);
-                    board.setAliveCellColor(Color.ORANGE);
-                    if (toggleButton.isSelected()) {
-                        board.setGridColor(Color.BLACK);
-                    } else {
-                        board.setGridColor(Color.GRAY);
-                    }
-                    currentThemeGridColor = Color.GRAY;
-                    board.repaint();
+                    theme.setTheme(ThemeName.FIRE, toggleButton.isSelected());
+                    board.setTheme(theme);
                 }
                 case "Blueprint" -> {
-                    Color darkBlue = new Color(0, 32, 128);
-                    board.setBackground(darkBlue);
-                    board.setAliveCellColor(Color.YELLOW);
-                    if (toggleButton.isSelected()) {
-                        board.setGridColor(darkBlue);
-                    } else {
-                        board.setGridColor(Color.DARK_GRAY);
-                    }
-                    currentThemeGridColor = Color.DARK_GRAY;
-                    board.repaint();
+                    theme.setTheme(ThemeName.BLUEPRINT, toggleButton.isSelected());
+                    board.setTheme(theme);
                 }
             }
         });

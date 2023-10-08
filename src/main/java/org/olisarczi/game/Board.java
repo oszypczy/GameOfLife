@@ -125,11 +125,12 @@ public class Board extends JPanel {
             g.fillRect(point.x * tileSize, point.y * tileSize, tileSize, tileSize);
         }
 
-        g.setColor(gridColor);
-        // Draw grid lines
-        for (int x = 0; x < boardWidthInTiles; x++) {
-            for (int y = 0; y < boardHeightInTiles; y++) {
-                g.drawRect(x * tileSize, y * tileSize, tileSize, tileSize);
+        if (gridColor != null) {
+            g.setColor(gridColor);
+            for (int x = 0; x < boardWidthInTiles; x++) {
+                for (int y = 0; y < boardHeightInTiles; y++) {
+                    g.drawRect(x * tileSize, y * tileSize, tileSize, tileSize);
+                }
             }
         }
     }
@@ -147,5 +148,12 @@ public class Board extends JPanel {
 
     public void updateBoardSize() {
         setPreferredSize(new Dimension(boardWidthInTiles, boardHeightInTiles));
+    }
+
+    public void setTheme(Theme theme){
+        this.aliveCellColor = theme.getAliveCellColor();
+        this.gridColor = theme.getCurrentGridColor();
+        this.setBackground(theme.getBackGroundColor());
+        repaint();
     }
 }
