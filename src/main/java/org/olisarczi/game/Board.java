@@ -16,24 +16,21 @@ import java.util.List;
 public class Board extends JPanel {
     @Getter
     private final List<Point> selectedCoordinates;
-    private boolean isMousePressed = false;
+    private boolean isLeftClicked = false;
+    private boolean isRightClicked = false;
     private int prevTileX, prevTileY;
-
     private double zoomFactor = 1;
-
     @Setter
     private int boardWidthInTiles;
     @Setter
     private int boardHeightInTiles;
-
     @Setter
     private Color aliveCellColor = Color.WHITE;
     @Setter
     private Color gridColor = Color.BLACK;
-
     private final int tileSize;
-
-    private java.awt.Point zoomCenter = new java.awt.Point(0, 0);
+    private Point zoomCenter = new Point(0, 0);
+    private final Point lastTouchedTile = new Point(-1, -1);
 
     public Board(int widthInTiles, int heightInTiles, int tileSize) {
         this.boardWidthInTiles = widthInTiles;
@@ -42,33 +39,49 @@ public class Board extends JPanel {
         setPreferredSize(new Dimension(widthInTiles * tileSize, heightInTiles * tileSize));
         setBackground(Color.GRAY);
         selectedCoordinates = new ArrayList<>();
+        listenToEvents();
+    }
 
+    private void listenToEvents(){
         addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                isMousePressed = true;
                 Point translatedPoint = translateMouseCoordinates(e.getPoint());
                 prevTileX = translatedPoint.x;
                 prevTileY = translatedPoint.y;
-                addCoordinate(prevTileX, prevTileY);
-            }
+                lastTouchedTile.setLocation(prevTileX, prevTileY);
 
+                if (e.getButton() == MouseEvent.BUTTON1) {
+                    isLeftClicked = true;
+                    addCoordinates(prevTileX, prevTileY);
+                } else if (e.getButton() == MouseEvent.BUTTON3) {
+                    isRightClicked = true;
+                    removeCoordinates(prevTileX, prevTileY);
+                }
+            }
             @Override
             public void mouseReleased(MouseEvent e) {
-                isMousePressed = false;
+                isLeftClicked = false;
+                isRightClicked = false;
             }
         });
 
         addMouseMotionListener(new MouseMotionAdapter() {
             @Override
             public void mouseDragged(MouseEvent e) {
-                if (isMousePressed) {
-                    Point translatedPoint = translateMouseCoordinates(e.getPoint());
-                    prevTileX = translatedPoint.x;
-                    prevTileY = translatedPoint.y;
-                    addCoordinate(prevTileX, prevTileY);
+                Point translatedPoint = translateMouseCoordinates(e.getPoint());
+                prevTileX = translatedPoint.x;
+                prevTileY = translatedPoint.y;
+
+                if (lastTouchedTile.getX() != prevTileX || lastTouchedTile.getY() != prevTileY) {
+                    if (isLeftClicked) {
+                        addCoordinates(prevTileX, prevTileY);
+                    } else if (isRightClicked) {
+                        removeCoordinates(prevTileX, prevTileY);
                     }
+                    lastTouchedTile.setLocation(prevTileX, prevTileY);
                 }
+            }
         });
 
         addMouseWheelListener(new MouseAdapter() {
@@ -103,9 +116,30 @@ public class Board extends JPanel {
         return new Point(tileX, tileY);
     }
 
-    private void addCoordinate(int tileX, int tileY) {
-        selectedCoordinates.add(new Point(tileX, tileY));
-        repaint();
+    private void addCoordinates(int tileX, int tileY) {
+        int index = findCoordinate(tileX, tileY);
+        if (index == -1){
+            selectedCoordinates.add(new Point(tileX, tileY));
+            repaint();
+        }
+    }
+
+    private void removeCoordinates(int tileX, int tileY) {
+        int index = findCoordinate(tileX, tileY);
+        if (index != -1){
+            selectedCoordinates.remove(index);
+            repaint();
+        }
+    }
+
+    private int findCoordinate(int x, int y){
+        for (int i = 0; i < selectedCoordinates.size(); i++){
+            Point currentPoint = selectedCoordinates.get(i);
+            if (currentPoint.getX() == x && currentPoint.getY() == y){
+                return i;
+            }
+        }
+        return -1;
     }
 
     @Override
