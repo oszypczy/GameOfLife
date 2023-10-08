@@ -28,8 +28,9 @@ public class Game {
     private final Theme theme = new Theme();
 
     public Game(int pixelsWidth, int pixelsHeight, int tileSize) {
-        this.boardWidthInTiles = pixelsWidth / tileSize;
-        this.boardHeightInTiles = pixelsHeight / tileSize;
+        tileSize = Math.max(tileSize, 4);
+        this.boardWidthInTiles = Math.max(pixelsWidth, 100) / tileSize;
+        this.boardHeightInTiles = Math.max(pixelsHeight, 100) / tileSize;
         initializeGUI(tileSize);
         listenToEvent(tileSize);
     }
