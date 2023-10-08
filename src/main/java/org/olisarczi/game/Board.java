@@ -33,6 +33,8 @@ public class Board extends JPanel {
 
     private final int tileSize;
 
+    private java.awt.Point zoomCenter = new java.awt.Point(0, 0);
+
     public Board(int widthInTiles, int heightInTiles, int tileSize) {
         this.boardWidthInTiles = widthInTiles;
         this.boardHeightInTiles = heightInTiles;
@@ -45,8 +47,9 @@ public class Board extends JPanel {
             @Override
             public void mousePressed(MouseEvent e) {
                 isMousePressed = true;
-                prevTileX = (int) ((e.getX() / tileSize) / zoomFactor);
-                prevTileY = (int) ((e.getY() / tileSize) / zoomFactor);
+                Point translatedPoint = translateMouseCoordinates(e.getPoint());
+                prevTileX = translatedPoint.x;
+                prevTileY = translatedPoint.y;
                 addCoordinate(prevTileX, prevTileY);
             }
 
@@ -60,15 +63,12 @@ public class Board extends JPanel {
             @Override
             public void mouseDragged(MouseEvent e) {
                 if (isMousePressed) {
-                    int tileX = (int) ((e.getX() / tileSize) / zoomFactor);
-                    int tileY = (int) ((e.getY() / tileSize) / zoomFactor);
-                    if (tileX != prevTileX || tileY != prevTileY) {
-                        addCoordinate(tileX, tileY);
-                        prevTileX = tileX;
-                        prevTileY = tileY;
+                    Point translatedPoint = translateMouseCoordinates(e.getPoint());
+                    prevTileX = translatedPoint.x;
+                    prevTileY = translatedPoint.y;
+                    addCoordinate(prevTileX, prevTileY);
                     }
                 }
-            }
         });
 
         addMouseWheelListener(new MouseAdapter() {
@@ -76,11 +76,31 @@ public class Board extends JPanel {
             public void mouseWheelMoved(MouseWheelEvent e) {
                 int rotation = e.getWheelRotation();
                 double scaleFactor = Math.pow(1.1, -rotation);
+                zoomCenter = e.getPoint(); // Store the cursor position
                 double newZoomFactor = zoomFactor * scaleFactor;
                 zoomFactor = Math.max(newZoomFactor, 1);
                 repaint();
             }
         });
+    }
+
+    private Point translateMouseCoordinates(Point coordinates) {
+        int mouseX = coordinates.x;
+        int mouseY = coordinates.y;
+
+        int dx = mouseX - zoomCenter.x;
+        int dy = mouseY - zoomCenter.y;
+
+        int zoomedX = (int) (dx / zoomFactor);
+        int zoomedY = (int) (dy / zoomFactor);
+
+        int scaledX = zoomCenter.x + zoomedX;
+        int scaledY = zoomCenter.y + zoomedY;
+
+        int tileX = scaledX / tileSize;
+        int tileY = scaledY / tileSize;
+
+        return new Point(tileX, tileY);
     }
 
     private void addCoordinate(int tileX, int tileY) {
@@ -92,8 +112,12 @@ public class Board extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
+
+        // Calculate the transformation matrix
         AffineTransform at = new AffineTransform();
-        at.scale(zoomFactor, zoomFactor);
+        at.translate(zoomCenter.x, zoomCenter.y); // Translate to the cursor position
+        at.scale(zoomFactor, zoomFactor); // Apply scaling
+        at.translate(-zoomCenter.x, -zoomCenter.y); // Translate back to the original position
         g2.transform(at);
 
         g.setColor(aliveCellColor);
@@ -124,7 +148,4 @@ public class Board extends JPanel {
     public void updateBoardSize() {
         setPreferredSize(new Dimension(boardWidthInTiles, boardHeightInTiles));
     }
-
 }
-
-
