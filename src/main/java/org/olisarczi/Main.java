@@ -5,9 +5,12 @@ import org.olisarczi.game.Game;
 import javax.swing.*;
 public class Main {
     public static void main(String[] args) {
-        int width = Integer.parseInt(args[0]);
-        int height = Integer.parseInt(args[1]);
-        System.out.println("Width: " + width + ", Height: " + height);
-        SwingUtilities.invokeLater(() -> new Game(width, height, 8));
+        SwingUtilities.invokeLater(() -> new Game(700, 700, 12));
     }
 }
+
+// to do:
+// - add tests
+// - right click to kill cell
+// - fix zooming
+// - add patterns

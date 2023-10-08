@@ -26,6 +26,11 @@ public class Board extends JPanel {
     @Setter
     private int boardHeightInTiles;
 
+    @Setter
+    private Color aliveCellColor = Color.WHITE;
+    @Setter
+    private Color gridColor = Color.BLACK;
+
     private final int tileSize;
 
     private java.awt.Point zoomCenter = new java.awt.Point(0, 0);
@@ -106,7 +111,6 @@ public class Board extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        g.setColor(Color.BLACK);
         Graphics2D g2 = (Graphics2D) g;
 
         // Calculate the transformation matrix
@@ -116,16 +120,17 @@ public class Board extends JPanel {
         at.translate(-zoomCenter.x, -zoomCenter.y); // Translate back to the original position
         g2.transform(at);
 
+        g.setColor(aliveCellColor);
+        for (Point point : selectedCoordinates) {
+            g.fillRect(point.x * tileSize, point.y * tileSize, tileSize, tileSize);
+        }
+
+        g.setColor(gridColor);
         // Draw grid lines
         for (int x = 0; x < boardWidthInTiles; x++) {
             for (int y = 0; y < boardHeightInTiles; y++) {
                 g.drawRect(x * tileSize, y * tileSize, tileSize, tileSize);
             }
-        }
-
-        g.setColor(Color.WHITE);
-        for (Point point : selectedCoordinates) {
-            g.fillRect(point.x * tileSize, point.y * tileSize, tileSize, tileSize);
         }
     }
 
