@@ -32,7 +32,10 @@ public class Board extends JPanel {
     private GameState gameState = GameState.STOPPED;
     private final int tileSize;
     private Point zoomCenter = new Point(0, 0);
-    private final Point lastTouchedTile = new Point(-1, -1);
+    private final Point lastTouchedTile = new Point();
+    private Point dragStart = new Point();
+    @Setter
+    private MouseMode mouseMode = MouseMode.DRAW;
 
     public Board(int widthInTiles, int heightInTiles, int tileSize) {
         this.boardWidthInTiles = widthInTiles;
@@ -48,19 +51,23 @@ public class Board extends JPanel {
         addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                if (gameState != GameState.RUNNING){
-                    Point translatedPoint = translateMouseCoordinates(e.getPoint());
-                    prevTileX = translatedPoint.x;
-                    prevTileY = translatedPoint.y;
-                    lastTouchedTile.setLocation(prevTileX, prevTileY);
+                if (mouseMode == MouseMode.DRAW){
+                    if (gameState != GameState.RUNNING){
+                        Point translatedPoint = translateMouseCoordinates(e.getPoint());
+                        prevTileX = translatedPoint.x;
+                        prevTileY = translatedPoint.y;
+                        lastTouchedTile.setLocation(prevTileX, prevTileY);
 
-                    if (e.getButton() == MouseEvent.BUTTON1) {
-                        isLeftClicked = true;
-                        addCoordinates(prevTileX, prevTileY);
-                    } else if (e.getButton() == MouseEvent.BUTTON3) {
-                        isRightClicked = true;
-                        removeCoordinates(prevTileX, prevTileY);
+                        if (e.getButton() == MouseEvent.BUTTON1) {
+                            isLeftClicked = true;
+                            addCoordinates(prevTileX, prevTileY);
+                        } else if (e.getButton() == MouseEvent.BUTTON3) {
+                            isRightClicked = true;
+                            removeCoordinates(prevTileX, prevTileY);
+                        }
                     }
+                } else {
+                    dragStart = e.getPoint();
                 }
             }
             @Override
@@ -73,17 +80,30 @@ public class Board extends JPanel {
         addMouseMotionListener(new MouseMotionAdapter() {
             @Override
             public void mouseDragged(MouseEvent e) {
-                Point translatedPoint = translateMouseCoordinates(e.getPoint());
-                prevTileX = translatedPoint.x;
-                prevTileY = translatedPoint.y;
+                if (mouseMode == MouseMode.DRAW){
+                    Point translatedPoint = translateMouseCoordinates(e.getPoint());
+                    prevTileX = translatedPoint.x;
+                    prevTileY = translatedPoint.y;
 
-                if (lastTouchedTile.getX() != prevTileX || lastTouchedTile.getY() != prevTileY) {
-                    if (isLeftClicked) {
-                        addCoordinates(prevTileX, prevTileY);
-                    } else if (isRightClicked) {
-                        removeCoordinates(prevTileX, prevTileY);
+                    if (lastTouchedTile.getX() != prevTileX || lastTouchedTile.getY() != prevTileY) {
+                        if (isLeftClicked) {
+                            addCoordinates(prevTileX, prevTileY);
+                        } else if (isRightClicked) {
+                            removeCoordinates(prevTileX, prevTileY);
+                        }
+                        lastTouchedTile.setLocation(prevTileX, prevTileY);
                     }
-                    lastTouchedTile.setLocation(prevTileX, prevTileY);
+                } else {
+                    Point dragEnd = e.getPoint();
+                    int dx = dragEnd.x - dragStart.x;
+                    int dy = dragEnd.y - dragStart.y;
+                    // Adjust the zoomCenter point by the change in mouse position
+                    zoomCenter.x -= dx;
+                    zoomCenter.y -= dy;
+                    // Update the initial mouse position for the next drag event
+                    dragStart = dragEnd;
+                    // Repaint to show the updated view
+                    repaint();
                 }
             }
         });

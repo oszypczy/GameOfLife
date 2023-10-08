@@ -18,7 +18,8 @@ public class Game {
     private JButton resetButton;
     private JButton increaseDelayButton;
     private JButton decreaseDelayButton;
-    private JToggleButton toggleButton;
+    private JToggleButton gridButton;
+    private JToggleButton mouseModeButton;
     private int boardWidthInTiles;
     private int boardHeightInTiles;
     private int timerDelay = 200;
@@ -46,13 +47,17 @@ public class Game {
         resetButton = new JButton("Reset");
         increaseDelayButton = new JButton("+");
         decreaseDelayButton = new JButton("-");
-        toggleButton = new JToggleButton("Grid ON");
-        toggleButton.setSelected(true);
+        gridButton = new JToggleButton("ON");
+        mouseModeButton = new JToggleButton("Draw");
+        gridButton.setSelected(true);
+        mouseModeButton.setSelected(true);
 
         // create labels
         generationLabel = new JLabel("Generation: 0");
         delayLabel = new JLabel("Delay (ms): " + timerDelay);
         JLabel themeLabel = new JLabel("Theme: ");
+        JLabel gridLabel = new JLabel("Grid: ");
+        JLabel mouseModeLabel = new JLabel("Mouse mode: ");
 
         // create dropdown list
         String[] options = {"Vanilla", "Fire", "Blueprint"};
@@ -72,7 +77,10 @@ public class Game {
         JPanel upperPanel = new JPanel();
         upperPanel.add(themeLabel);
         upperPanel.add(comboBox);
-        upperPanel.add(toggleButton);
+        upperPanel.add(gridLabel);
+        upperPanel.add(gridButton);
+        upperPanel.add(mouseModeLabel);
+        upperPanel.add(mouseModeButton);
         frame.add(upperPanel, BorderLayout.NORTH);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
@@ -80,16 +88,26 @@ public class Game {
     }
 
     private void listenToEvent(int tileSize){
-        toggleButton.addActionListener(e -> {
-            if (toggleButton.isSelected()) {
-                toggleButton.setText("Grid ON");
+        gridButton.addActionListener(e -> {
+            if (gridButton.isSelected()) {
+                gridButton.setText("ON");
                 board.setGridColor(theme.getThemeGridColor());
                 board.repaint();
             } else {
-                toggleButton.setText("Grid OFF");
-                toggleButton.setBackground(Color.RED);
+                gridButton.setText("OFF");
+                gridButton.setBackground(Color.RED);
                 board.setGridColor(null);
                 board.repaint();
+            }
+        });
+
+        mouseModeButton.addActionListener(e -> {
+            if (mouseModeButton.isSelected()) {
+                mouseModeButton.setText("Draw");
+                board.setMouseMode(MouseMode.DRAW);
+            } else {
+                mouseModeButton.setText("Drag");
+                board.setMouseMode(MouseMode.DRAG);
             }
         });
 
@@ -97,15 +115,15 @@ public class Game {
             String selectedOption = (String) comboBox.getSelectedItem();
             switch (Objects.requireNonNull(selectedOption)) {
                 case "Vanilla" -> {
-                    theme.setTheme(ThemeName.VANILLA, toggleButton.isSelected());
+                    theme.setTheme(ThemeName.VANILLA, gridButton.isSelected());
                     board.setTheme(theme);
                 }
                 case "Fire" -> {
-                    theme.setTheme(ThemeName.FIRE, toggleButton.isSelected());
+                    theme.setTheme(ThemeName.FIRE, gridButton.isSelected());
                     board.setTheme(theme);
                 }
                 case "Blueprint" -> {
-                    theme.setTheme(ThemeName.BLUEPRINT, toggleButton.isSelected());
+                    theme.setTheme(ThemeName.BLUEPRINT, gridButton.isSelected());
                     board.setTheme(theme);
                 }
             }
