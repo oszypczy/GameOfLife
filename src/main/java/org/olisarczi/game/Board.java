@@ -113,7 +113,7 @@ public class Board extends JPanel {
             public void mouseWheelMoved(MouseWheelEvent e) {
                 int rotation = e.getWheelRotation();
                 double scaleFactor = Math.pow(1.1, -rotation);
-                zoomCenter = e.getPoint(); // Store the cursor position
+                zoomCenter = e.getPoint();
                 double newZoomFactor = zoomFactor * scaleFactor;
                 zoomFactor = Math.max(newZoomFactor, 1);
                 repaint();
@@ -141,29 +141,16 @@ public class Board extends JPanel {
     }
 
     private void addCoordinates(int tileX, int tileY) {
-        int index = findCoordinate(tileX, tileY);
-        if (index == -1){
-            selectedCoordinates.add(new Point(tileX, tileY));
+        Point newPoint = new Point(tileX, tileY);
+        if (!selectedCoordinates.contains(newPoint)) {
+            selectedCoordinates.add(newPoint);
             repaint();
         }
     }
 
     private void removeCoordinates(int tileX, int tileY) {
-        int index = findCoordinate(tileX, tileY);
-        if (index != -1){
-            selectedCoordinates.remove(index);
-            repaint();
-        }
-    }
-
-    private int findCoordinate(int x, int y){
-        for (int i = 0; i < selectedCoordinates.size(); i++){
-            Point currentPoint = selectedCoordinates.get(i);
-            if (currentPoint.getX() == x && currentPoint.getY() == y){
-                return i;
-            }
-        }
-        return -1;
+        selectedCoordinates.remove(new Point(tileX, tileY));
+        repaint();
     }
 
     @Override
